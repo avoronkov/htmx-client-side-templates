@@ -1,3 +1,28 @@
+/**
+ * @param {string} templateId
+ * @param {Object.<string, string>} deps
+ */
+function templateDeps(templateId, deps) {
+    if (deps[templateId]) {
+        return deps;
+    }
+    const template = htmx.find("#" + templateId);
+    if (!template) {
+        throw "Unknown mustache template: " + templateId;
+    }
+    const tbody = template.innerHTML.replaceAll('{{&gt;', '{{>');
+    deps[templateId] = tbody;
+    const re = /\{\{>([\w\-_]+)\}\}/gm;
+    for (const depMatch of tbody.matchAll(re)) {
+        const dep = depMatch[1];
+        if (deps[dep]) {
+            continue
+        }
+        const childDeps = templateDeps(dep, deps);
+        deps = { ...deps, ...childDeps };
+    }
+    return deps;
+}
 htmx.defineExtension('client-side-templates', {
     transformResponse : function(text, xhr, elt) {
 
@@ -7,7 +32,8 @@ htmx.defineExtension('client-side-templates', {
             var templateId = mustacheTemplate.getAttribute('mustache-template');
             var template = htmx.find("#" + templateId);
             if (template) {
-                return Mustache.render(template.innerHTML, data);
+                const deps = templateDeps(templateId, {});
+                return Mustache.render(deps[templateId], data, deps);
             } else {
                 throw "Unknown mustache template: " + templateId;
             }
@@ -19,7 +45,8 @@ htmx.defineExtension('client-side-templates', {
             var templateId = mustacheArrayTemplate.getAttribute('mustache-array-template');
             var template = htmx.find("#" + templateId);
             if (template) {
-                return Mustache.render(template.innerHTML, {"data": data });
+                const deps = templateDeps(templateId, {});
+                return Mustache.render(deps[templateId], {"data": data }, deps);
             } else {
                 throw "Unknown mustache template: " + templateId;
             }
