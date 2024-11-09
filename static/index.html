@@ -3,6 +3,7 @@
   <head>
     <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
     <script src="/static/client-side-templates.js"></script>
+    <script src="https://unpkg.com/mustache@latest"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
@@ -15,7 +16,54 @@
   <body hx-ext="client-side-templates">
     <main class="container">
       <h1>Hello, templates!</h1>
-      <button>OK</button>
+
+      <nav id="tablist"
+           hx-get="/api/tabs"
+           hx-trigger="load"
+           hx-target="#tablist"
+           hx-swap="innerHTML"
+           mustache-template="tabListTpl"
+      >
+        Loading...
+      </nav>
+
+      <div id="tabcontent">
+        Click tab to load content.
+      </div>
+
+      <template id="tabListTpl">
+        <ul>
+          {{#tabs}}
+          <li>
+            <a href="{{id}}"
+               hx-get="/api/tabs/{{id}}"
+               hx-push-url="/{{id}}"
+               hx-target="#tabcontent"
+               hx-swap="innerHTML"
+               mustache-template="tabContentTpl"
+              >
+              {{title}}
+            </a>
+          </li>
+          {{/tabs}}
+        </ul>
+      </template>
+
+      <template id="tabContentTpl">
+        <table>
+          {{#lines}}
+          {{>contentLineTpl}}
+          {{/lines}}
+        </table>
+      </template>
+
+      <template id="contentLineTpl">
+        <tr>
+          <td>{{first}}</td>
+          <td>{{second}} </td>
+          <td>{{third}}</td>
+        </tr>
+      </template>
     </main>
   </body>
 </html>
