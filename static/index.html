@@ -1,73 +1,83 @@
 <!doctype html>
 <html>
-  <head>
-    <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous"></script>
-    <script src="/static/client-side-templates.js"></script>
-    <script src="https://unpkg.com/mustache@latest"></script>
-	<script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-    >
-    <link rel="stylesheet" href="/static/main.css">
-    <title>Hello world!</title>
-  </head>
-  <body hx-ext="client-side-templates">
-    <main class="container">
-      <h1>Hello, templates!</h1>
+	<head>
+		<script
+			src="https://unpkg.com/htmx.org@2.0.3"
+			integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+			crossorigin="anonymous"
+		></script>
+		<script src="/static/client-side-templates.js"></script>
+		<script src="https://unpkg.com/mustache@latest"></script>
+		<script src="https://unpkg.com/hyperscript.org@0.9.13"></script>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+		/>
+		<link rel="stylesheet" href="/static/main.css" />
+		<title>Hello world!</title>
+	</head>
+	<body hx-ext="client-side-templates">
+		<main class="container">
+			<h1>Hello, templates!</h1>
 
-      <nav id="tablist"
-           hx-get="/api/tabs"
-           hx-trigger="load"
-           hx-target="#tablist"
-           hx-swap="innerHTML"
-           mustache-template="tabListTpl"
-      >
-        Loading...
-      </nav>
+			<nav
+				id="tablist"
+				hx-get="/api/tabs"
+				hx-trigger="load"
+				hx-target="#tablist"
+				hx-swap="innerHTML"
+				mustache-template="tabListTpl"
+			>
+				Loading...
+			</nav>
 
-      <div id="tabcontent">
-        Click tab to load content.
-      </div>
+			<div
+				id="tabcontent"
+				_="on load set p to window.location.pathname then if p is not '/' call htmx.ajax('GET', '/api/tabs'+p, { source: '#tabcontent' })"
+				hx-target="#tabcontent"
+				hx-swap="innerHTML"
+				mustache-template="tabContentTpl"
+			>
+				Loading...
+			</div>
 
-      <template id="tabListTpl">
-        <ul>
-          {{#tabs}}
-          <li>
-            <a href="{{id}}"
-               class="tabTitle"
-               _="on click remove .tabSelected from .tabTitle then add .tabSelected"
-               hx-get="/api/tabs/{{id}}"
-               hx-push-url="/{{id}}"
-               hx-target="#tabcontent"
-               hx-swap="innerHTML"
-               mustache-template="tabContentTpl"
-              >
-              {{title}}
-            </a>
-          </li>
-          {{/tabs}}
-        </ul>
-      </template>
+			<template id="tabListTpl">
+				<ul>
+					{{#tabs}}
+					<li>
+						<a
+							href="{{id}}"
+							class="tabTitle"
+							_="on click remove .tabSelected from .tabTitle then add .tabSelected"
+							hx-get="/api/tabs/{{id}}"
+							hx-push-url="/{{id}}"
+							hx-target="#tabcontent"
+							hx-swap="innerHTML"
+							mustache-template="tabContentTpl"
+						>
+							{{title}}
+						</a>
+					</li>
+					{{/tabs}}
+				</ul>
+			</template>
 
-      <template id="tabContentTpl">
-        <table>
-          {{#lines}}
-          {{>contentLineTpl}}
-          {{/lines}}
-        </table>
-      </template>
+			<template id="tabContentTpl">
+				<table>
+					{{#lines}} {{>contentLineTpl}} {{/lines}}
+				</table>
+			</template>
 
-      <template id="contentLineTpl">
-        <tr>
-          <td>{{first}}</td>
-          <td>{{second}} </td>
-          <td>{{third}}</td>
-        </tr>
-      </template>
-    </main>
-  </body>
+			<template id="contentLineTpl">
+				<tr>
+					<td>{{first}}</td>
+					<td>{{second}}</td>
+					<td>{{third}}</td>
+				</tr>
+			</template>
+		</main>
+	</body>
 </html>
