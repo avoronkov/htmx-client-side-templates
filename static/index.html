@@ -38,7 +38,8 @@
           {{#tabs}}
           <li>
             <a href="{{id}}"
-			   _ = "on click add .tabSelected to itself"
+               class="tabTitle"
+               _="on click remove .tabSelected from .tabTitle then add .tabSelected"
                hx-get="/api/tabs/{{id}}"
                hx-push-url="/{{id}}"
                hx-target="#tabcontent"
